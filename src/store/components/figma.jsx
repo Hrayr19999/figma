@@ -4,14 +4,14 @@ import Highcharts from "highcharts";
 import "@wix/design-system/styles.global.css";
 import { useEffect } from "react";
 import HighchartsReact from "highcharts-react-official";
-import { Table } from "@wix/design-system";
+import { Table, Box, Layout, Cell, Text } from "@wix/design-system";
 
 function getPrimitiveKeys(obj) {
     return Object.entries(obj).filter(([key, values]) => typeof values !== "object" || values === null);
 }
 
 function Figma() {
-    const { data, loading, error } = useSelector((state) => state.data);
+    const { data, loading } = useSelector((state) => state.data);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -27,7 +27,7 @@ function Figma() {
             )}
             {data && (
                 <div>
-                    <div>
+                    <div style={{ backgroundColor: "white", marginBottom: "20px", borderRadius: "5px" }}>
                         <svg xmlns="http://www.w3.org/2000/svg" width="255" height="50" viewBox="0 0 255 50" fill="none">
                             <path
                                 d="M8.73832 24.3455H31.3785V26.2654H8.73832V24.3455ZM18.6682 8.59375H31.3785V10.4264H18.6682V8.59375ZM8.73832 39.5301H21.1467V41.3625H8.73832V39.5301Z"
@@ -52,34 +52,57 @@ function Figma() {
                             />
                         </svg>
                     </div>
-                    <div>
-                        {getPrimitiveKeys(data).map(([key, values], i) => {
-                            return (
-                                <div key={i}>
-                                    <p>{key}</p>
-                                    <p>{values}</p>
-                                </div>
-                            );
-                        })}
+                    <div style={{ display: "flex", flexWrap: "wrap", flexDirection: "column" }}>
+                        <Box verticalAlign="space-between" direction="vertical" height="100%">
+                            <Layout cols={1}>
+                                <Layout>
+                                    {getPrimitiveKeys(data).map(([key, values], i) => {
+                                        return (
+                                            <Cell span={3} className="total">
+                                                <Text size="medium">
+                                                    <p style={{ paddingBottom: "5px" }}>{key.slice(0, 1).toUpperCase() + key.slice(1)}</p>
+                                                </Text>
+                                                <Text weight="bold">{values}</Text>
+                                                <Text size="tiny">
+                                                    <span className={i % 2 === 0 ? "totalValues" : "totalValues1"}>48.8%</span>
+                                                </Text>
+                                            </Cell>
+                                        );
+                                    })}
+                                </Layout>
+                            </Layout>
+                        </Box>
                     </div>
-                    <div>
-                        {data.chartData.series.map((item, i) => {
-                            console.log(data);
-                            return (
-                                <div key={i}>
-                                    <p>{item.name}</p>
-                                </div>
-                            );
-                        })}
-                    </div>
-                    <div>
-                        <div>
-                            <HighchartsReact highcharts={Highcharts} options={data.chartData} />
-                        </div>
+
+                    <div className="diagram">
+                        <Text weight="normal" className="performance">
+                            Performance
+                        </Text>
+                        <Box verticalAlign="space-between" direction="vertical" height="100%" padding="10px">
+                            <Layout cols={1} gap="60px">
+                                <Layout>
+                                    {data.chartData.series.map((item, i) => {
+                                        return (
+                                            <Cell span={3}>
+                                                <div key={i} style={{ borderLeft: item.color + " solid ", paddingLeft: "5px" }}>
+                                                    <Text size="normal">
+                                                        <p>{item.name}</p>
+                                                    </Text>
+                                                    <Text weight="bold">
+                                                        <p>{item.data[0]}</p>
+                                                    </Text>
+                                                </div>
+                                            </Cell>
+                                        );
+                                    })}
+                                </Layout>
+                            </Layout>
+                        </Box>
+                        <HighchartsReact highcharts={Highcharts} options={data.chartData} />
                     </div>
                     <div>
                         {
-                            <div style={{ maxHeight: "360px", overflowY: "scroll" }}>
+                            <div style={{ overflowY: "scroll", height: "340px" }}>
                                 <Table
                                     skin="standard"
                                     data={data.users}
@@ -89,9 +112,7 @@ function Figma() {
                                             render: (row) => row[item],
                                         };
                                     })}
-                                >
-                                    <Table.Content />
-                                </Table>
+                                ></Table>
                             </div>
                         }
                     </div>
